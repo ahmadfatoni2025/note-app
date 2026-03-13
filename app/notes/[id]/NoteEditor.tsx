@@ -67,51 +67,33 @@ export default function NoteEditor({ initialNote }: NoteEditorProps) {
   };
 
   return (
-    <div className="flex h-screen bg-[#191919] text-[#f1f1f1] overflow-hidden font-sans">
-      <style jsx global>{`
-        .notion-nav-item {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 8px 12px;
-          border-radius: 6px;
-          color: rgba(255, 255, 255, 0.44);
-          font-size: 14px;
-          font-weight: 500;
-          transition: all 0.2s ease;
-          cursor: pointer;
-        }
-        .notion-nav-item:hover {
-          background: rgba(255, 255, 255, 0.05);
-          color: white;
-        }
-        .prose h1 { margin-bottom: 2rem !important; font-weight: 800 !important; letter-spacing: -0.02em !important; }
-        .tiptap { border: none !important; outline: none !important; }
-      `}</style>
+    <div className="flex h-screen bg-bg-main text-text-primary overflow-hidden font-sans">
+      {/* Navigation and Layout handled by Tailwind classes */}
+
 
       {/* 1. Simplified Left Navigation */}
-      <aside className="w-64 border-r border-[#2f2f2f] bg-[#202020] flex flex-col hidden md:flex shrink-0">
-        <div className="p-6 flex items-center gap-3 font-bold text-base border-b border-[#2f2f2f]/50">
+      <aside className="w-64 border-r border-border-main bg-bg-sidebar flex flex-col hidden md:flex shrink-0">
+        <div className="p-6 flex items-center gap-3 font-bold text-base border-b border-border-main/50">
           <div className="w-6 h-6 bg-accent-purple rounded-lg flex items-center justify-center text-[11px] text-white shadow-lg shadow-purple-500/20">N</div>
           NotesPro
         </div>
 
         <div className="flex-1 overflow-y-auto p-3 space-y-1">
-          <Link href="/dashboard" className="notion-nav-item">
+          <Link href="/dashboard" className="flex items-center gap-2.5 px-3 py-2 rounded-md text-[14px] font-medium text-text-secondary hover:bg-white/5 hover:text-white transition-all cursor-pointer">
             <ChevronLeft size={16} /> 
             <span>Dashboard</span>
           </Link>
-          <div className="h-px bg-[#2f2f2f] my-4 mx-2" />
-          <div className="notion-nav-item text-white bg-white/5">
+          <div className="h-px bg-border-main my-4 mx-2" />
+          <div className="flex items-center gap-2.5 px-3 py-2 rounded-md text-[14px] font-medium text-white bg-white/5 cursor-default">
             <StickyNote size={16} className="text-accent-purple" /> 
             <span className="truncate">{note.title || "Catatan Saat Ini"}</span>
           </div>
         </div>
         
-        <div className="p-4 border-t border-[#2f2f2f]/50">
+        <div className="p-4 border-t border-border-main/50">
           <button 
             onClick={handleDelete}
-            className="notion-nav-item w-full text-red-400/60 hover:text-red-400 hover:bg-red-400/5"
+            className="flex items-center gap-2.5 px-3 py-2 rounded-md text-[14px] font-medium w-full text-red-400/60 hover:text-red-400 hover:bg-red-400/5 transition-all"
           >
              <Trash2 size={16} /> <span>Hapus Catatan</span>
           </button>
@@ -119,17 +101,17 @@ export default function NoteEditor({ initialNote }: NoteEditorProps) {
       </aside>
 
       {/* 2. Main Content Area */}
-      <div className="flex-1 flex flex-col relative overflow-hidden bg-[#191919]">
+      <div className="flex-1 flex flex-col relative overflow-hidden bg-bg-main">
         {/* Top Header */}
-        <header className="h-14 border-b border-[#2f2f2f]/50 flex items-center justify-between px-6 bg-[#191919]/80 backdrop-blur-md z-30">
-          <div className="flex items-center gap-2 text-[13px] font-medium text-[#737373]">
+        <header className="h-14 border-b border-border-main/50 flex items-center justify-between px-6 bg-bg-main/80 backdrop-blur-md z-30">
+          <div className="flex items-center gap-2 text-[13px] font-medium text-text-secondary">
             <span className="hover:text-white cursor-pointer transition-colors">Workspace</span>
             <span className="opacity-30">/</span>
             <span className="text-white/80 truncate max-w-[150px]">{note.title || "Untitled"}</span>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-[10px] font-bold text-[#737373] uppercase tracking-widest">
+            <div className="flex items-center gap-2 text-[10px] font-bold text-text-secondary uppercase tracking-widest">
               {isSaving ? (
                 <span className="flex items-center gap-2 text-accent-purple">
                   <div className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse" /> Saving...
@@ -139,12 +121,12 @@ export default function NoteEditor({ initialNote }: NoteEditorProps) {
               )}
             </div>
             
-            <div className="w-px h-4 bg-[#2f2f2f]" />
+            <div className="w-px h-4 bg-border-main" />
             
-            <button className="p-2 text-[#737373] hover:text-white transition-colors" title="Share">
+            <button className="p-2 text-text-secondary hover:text-white transition-colors" title="Share">
               <Share2 size={18} />
             </button>
-            <button className="action-icon w-9! h-9! md:hidden" onClick={() => router.push('/dashboard')}>
+            <button className="w-9 h-9 flex items-center justify-center rounded-full bg-bg-card text-text-secondary hover:text-text-primary hover:bg-white/5 transition-all shadow-sm md:hidden" onClick={() => router.push('/dashboard')}>
               <ChevronLeft size={20} />
             </button>
           </div>
@@ -175,7 +157,7 @@ export default function NoteEditor({ initialNote }: NoteEditorProps) {
 
           {/* Minimalist AI Floating Bar */}
           <div className="fixed bottom-10 left-1/2 -translate-x-1/2 w-full max-w-lg px-6 z-40">
-            <div className="bg-[#252525]/90 backdrop-blur-xl border border-white/5 shadow-2xl rounded-2xl p-2 flex items-center gap-3 ring-1 ring-white/5 ring-inset">
+            <div className="bg-bg-card/90 backdrop-blur-xl border border-white/5 shadow-2xl rounded-2xl p-2 flex items-center gap-3 ring-1 ring-white/5 ring-inset">
               <div className="w-9 h-9 rounded-xl bg-accent-purple/10 flex items-center justify-center text-accent-purple shrink-0">
                  <Globe size={18} />
               </div>

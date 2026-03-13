@@ -58,7 +58,7 @@ export default function Toolbar({ editor }: ToolbarProps) {
   };
 
   return (
-    <div className="editor-toolbar sticky top-0 z-20 py-2 bg-[#191919]/90 backdrop-blur-sm border-b border-[#2f2f2f] mb-8">
+    <div className="editor-toolbar sticky top-0 z-20 py-2 bg-bg-main/90 backdrop-blur-sm border-b border-border-main mb-8">
       <div className="flex flex-nowrap overflow-x-auto gap-1 items-center custom-scrollbar-hide">
         <div className="flex items-center gap-0.5 px-2">
           <ToolbarButton onClick={() => editor.chain().focus().undo().run()} title="Undo">
@@ -69,7 +69,7 @@ export default function Toolbar({ editor }: ToolbarProps) {
           </ToolbarButton>
         </div>
 
-        <div className="w-px h-4 bg-[#2f2f2f] mx-1" />
+        <div className="w-px h-4 bg-border-main mx-1" />
 
         <div className="flex items-center gap-0.5 px-2">
           <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive("bold")} title="Bold">
@@ -83,7 +83,7 @@ export default function Toolbar({ editor }: ToolbarProps) {
           </ToolbarButton>
         </div>
 
-        <div className="w-px h-4 bg-[#2f2f2f] mx-1" />
+        <div className="w-px h-4 bg-border-main mx-1" />
 
         <div className="flex items-center gap-0.5 px-2">
           <ToolbarButton onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} isActive={editor.isActive("heading", { level: 1 })} title="H1">
@@ -94,7 +94,7 @@ export default function Toolbar({ editor }: ToolbarProps) {
           </ToolbarButton>
         </div>
 
-        <div className="w-px h-4 bg-[#2f2f2f] mx-1" />
+        <div className="w-px h-4 bg-border-main mx-1" />
 
         <div className="flex items-center gap-0.5 px-2">
           <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive("bulletList")} title="Bullet List">
@@ -108,7 +108,7 @@ export default function Toolbar({ editor }: ToolbarProps) {
           </ToolbarButton>
         </div>
 
-        <div className="w-px h-4 bg-[#2f2f2f] mx-1" />
+        <div className="w-px h-4 bg-border-main mx-1" />
 
         <div className="flex items-center gap-0.5 px-2">
           <ToolbarButton onClick={toggleLink} isActive={editor.isActive("link")} title="Link">
