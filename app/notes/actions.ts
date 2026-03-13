@@ -1,120 +1,109 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
-// ==================== CREATE ====================
-export async function createNote(formData: FormData) {
-  const title = formData.get("title") as string;
-  const content = formData.get("content") as string;
-  const course_name = formData.get("course_name") as string;
-  const semester = formData.get("semester") as string;
-  const file = formData.get("file") as File | null;
+export async function createNote(workspaceId?: string, folderId?: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  let file_url: string | null = null;
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
 
-  // Upload file to Supabase Storage if provided
-  if (file && file.size > 0) {
-    try {
-      const supabase = await createClient();
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+  // Ensure user record exists in Prisma (Sync with Supabase)
+  let dbUser = await prisma.user.findUnique({
+    where: { id: user.id }
+  });
 
-      const { error: uploadError } = await supabase.storage
-        .from("note-attachments")
-        .upload(fileName, file);
-
-      if (uploadError) {
-        return { error: `File upload failed: ${uploadError.message}` };
+  if (!dbUser) {
+    dbUser = await prisma.user.create({
+      data: {
+        id: user.id,
+        email: user.email!,
+        full_name: user.user_metadata?.full_name || null,
       }
-
-      const { data: urlData } = supabase.storage
-        .from("note-attachments")
-        .getPublicUrl(fileName);
-
-      file_url = urlData.publicUrl;
-    } catch {
-      return { error: "File upload failed" };
-    }
+    });
   }
 
-  try {
-    await prisma.note.create({
-      data: {
-        title,
-        content: content || null,
-        course_name: course_name || null,
-        semester: semester || null,
-        file_url,
-      },
+  // Get first workspace if not provided
+  let targetWorkspaceId = workspaceId;
+  if (!targetWorkspaceId) {
+    const ws = await prisma.workspace.findFirst({
+      where: { user_id: user.id }
     });
-  } catch (error) {
-    return { error: `Failed to create note: ${error instanceof Error ? error.message : "Unknown error"}` };
-  }
-
-  revalidatePath("/notes");
-  return { success: true };
-}
-
-// ==================== UPDATE ====================
-export async function updateNote(formData: FormData) {
-  const id = formData.get("id") as string;
-  const title = formData.get("title") as string;
-  const content = formData.get("content") as string;
-  const course_name = formData.get("course_name") as string;
-  const semester = formData.get("semester") as string;
-
-  try {
-    await prisma.note.update({
-      where: { id },
-      data: {
-        title,
-        content: content || null,
-        course_name: course_name || null,
-        semester: semester || null,
-      },
-    });
-  } catch (error) {
-    return { error: `Failed to update note: ${error instanceof Error ? error.message : "Unknown error"}` };
-  }
-
-  revalidatePath("/notes");
-  return { success: true };
-}
-
-// ==================== DELETE ====================
-export async function deleteNote(formData: FormData) {
-  const id = formData.get("id") as string;
-
-  try {
-    // Get the note first to check for attached file
-    const note = await prisma.note.findUnique({
-      where: { id },
-      select: { file_url: true },
-    });
-
-    // Delete the attached file from Supabase Storage if it exists
-    if (note?.file_url) {
-      try {
-        const supabase = await createClient();
-        const fileName = note.file_url.split("/").pop();
-        if (fileName) {
-          await supabase.storage.from("note-attachments").remove([fileName]);
+    
+    if (ws) {
+      targetWorkspaceId = ws.id;
+    } else {
+      // Create a default workspace if none exists
+      const defaultWs = await prisma.workspace.create({
+        data: {
+          name: "Ruang Kerja Utama",
+          user_id: user.id,
+          color: "#7c3aed",
+          icon: "LayoutDashboard"
         }
-      } catch {
-        // Storage cleanup failure shouldn't block note deletion
-      }
+      });
+      targetWorkspaceId = defaultWs.id;
     }
-
-    // Delete the note from the database
-    await prisma.note.delete({
-      where: { id },
-    });
-  } catch (error) {
-    return { error: `Failed to delete note: ${error instanceof Error ? error.message : "Unknown error"}` };
   }
 
-  revalidatePath("/notes");
-  return { success: true };
+  const note = await prisma.note.create({
+    data: {
+      title: "Catatan Baru",
+      content: "",
+      user_id: user.id,
+      workspace_id: targetWorkspaceId,
+      folder_id: folderId || null,
+      status: "Ice Box"
+    }
+  });
+
+  revalidatePath("/dashboard");
+  redirect(`/notes/${note.id}`);
+}
+
+export async function updateNote(id: string, data: { title?: string; content?: string; status?: string }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Unauthorized");
+
+  const note = await prisma.note.update({
+    where: { id, user_id: user.id },
+    data
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath(`/notes/${id}`);
+  return note;
+}
+
+export async function deleteNote(id: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) throw new Error("Unauthorized");
+
+  await prisma.note.delete({
+    where: { id, user_id: user.id }
+  });
+
+  revalidatePath("/dashboard");
+  redirect("/dashboard");
+}
+
+export async function getNotes() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
+  return await prisma.note.findMany({
+    where: { user_id: user.id },
+    orderBy: { updated_at: 'desc' }
+  });
 }

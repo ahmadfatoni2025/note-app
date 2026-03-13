@@ -8,5 +8,10 @@
  *
  * 🟢 You can import this file directly.
  */
+export type * from './models/User'
+export type * from './models/Workspace'
+export type * from './models/Folder'
 export type * from './models/Note'
+export type * from './models/Tag'
+export type * from './models/NoteTag'
 export type * from './commonInputTypes'

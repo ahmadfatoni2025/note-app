@@ -51,7 +51,12 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  Note: 'Note'
+  User: 'User',
+  Workspace: 'Workspace',
+  Folder: 'Folder',
+  Note: 'Note',
+  Tag: 'Tag',
+  NoteTag: 'NoteTag'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -70,18 +75,78 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const UserScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  full_name: 'full_name',
+  avatar_url: 'avatar_url',
+  created_at: 'created_at'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const WorkspaceScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  color: 'color',
+  icon: 'icon',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  user_id: 'user_id'
+} as const
+
+export type WorkspaceScalarFieldEnum = (typeof WorkspaceScalarFieldEnum)[keyof typeof WorkspaceScalarFieldEnum]
+
+
+export const FolderScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  workspace_id: 'workspace_id',
+  parent_id: 'parent_id'
+} as const
+
+export type FolderScalarFieldEnum = (typeof FolderScalarFieldEnum)[keyof typeof FolderScalarFieldEnum]
+
+
 export const NoteScalarFieldEnum = {
   id: 'id',
   title: 'title',
   content: 'content',
-  course_name: 'course_name',
-  semester: 'semester',
+  status: 'status',
+  priority: 'priority',
+  due_date: 'due_date',
   file_url: 'file_url',
   created_at: 'created_at',
-  updated_at: 'updated_at'
+  updated_at: 'updated_at',
+  user_id: 'user_id',
+  workspace_id: 'workspace_id',
+  folder_id: 'folder_id'
 } as const
 
 export type NoteScalarFieldEnum = (typeof NoteScalarFieldEnum)[keyof typeof NoteScalarFieldEnum]
+
+
+export const TagScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  color: 'color',
+  user_id: 'user_id',
+  workspace_id: 'workspace_id'
+} as const
+
+export type TagScalarFieldEnum = (typeof TagScalarFieldEnum)[keyof typeof TagScalarFieldEnum]
+
+
+export const NoteTagScalarFieldEnum = {
+  note_id: 'note_id',
+  tag_id: 'tag_id'
+} as const
+
+export type NoteTagScalarFieldEnum = (typeof NoteTagScalarFieldEnum)[keyof typeof NoteTagScalarFieldEnum]
 
 
 export const SortOrder = {
